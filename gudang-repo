@@ -25,7 +25,7 @@ while true; do
     MAP_ISO=$(find /home /root -type f -name "*${DISTRO}*" -name "*DVD*.iso" 2>/dev/null)
 
     if [ -z "$MAP_ISO" ]; then
-        echo "[!] Tidak ditemukan file ISO $DISTRO dengan tulisan 'DVD' (huruf besar)."
+        echo "[!] Tidak ditemukan file ISO $DISTRO yang bertype 'DVD'."
     else
         echo "----------------------------------------------------------"
         echo "Ditemukan file DVD yang cocok:"
