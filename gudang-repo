@@ -1,0 +1,84 @@
+#!/bin/bash
+
+# Cek akses root
+if [ "$EUID" -ne 0 ]; then 
+  echo "Gunakan sudo: sudo gabung-repo"
+  exit 1
+fi
+
+while true; do
+    echo "=========================================================="
+    echo "      GABUNG REPO (FILTER KHUSUS: DVD)                    "
+    echo "=========================================================="
+
+    # 1. Pertanyaan Pertama: Nama Distro
+    read -p "DVD Repo apa yang dicari? (contoh: debian): " DISTRO
+    if [ -z "$DISTRO" ]; then
+        echo "Nama tidak boleh kosong."
+        continue
+    fi
+
+    # 2. Mencari dengan Filter Ketat: Nama Distro + kata "DVD"
+    echo "[*] Mencari file ISO $DISTRO yang mengandung kata 'DVD'..."
+    
+    # -name "*DVD*.iso" memastikan hanya file dengan huruf besar DVD yang diambil
+    MAP_ISO=$(find /home /root -type f -name "*${DISTRO}*" -name "*DVD*.iso" 2>/dev/null)
+
+    if [ -z "$MAP_ISO" ]; then
+        echo "[!] Tidak ditemukan file ISO $DISTRO dengan tulisan 'DVD' (huruf besar)."
+    else
+        echo "----------------------------------------------------------"
+        echo "Ditemukan file DVD yang cocok:"
+        echo "$MAP_ISO"
+        echo "----------------------------------------------------------"
+        
+        # 3. Konfirmasi: Apakah ini yang dimaksud?
+        read -p "Apakah file DVD di atas sudah benar? (y/n): " KONFIRMASI
+        
+        if [[ "$KONFIRMASI" =~ ^[Yy]$ ]]; then
+            DEST="/home/repo-${DISTRO}-DVD-lokal"
+            mkdir -p "$DEST"
+            echo "[*] Menyatukan isi ke $DEST..."
+
+            for ISO in $MAP_ISO; do
+                echo "-> Memproses $(basename "$ISO")..."
+                mkdir -p /mnt/temp_gabung
+                
+                # Mount file ISO secara virtual
+                if mount -o loop "$ISO" /mnt/temp_gabung 2>/dev/null; then
+                    # Menggabungkan isi ke SSD NVMe Anda
+                    rsync -av --progress /mnt/temp_gabung/pool/ "$DEST/pool/" 2>/dev/null
+                    rsync -av --progress /mnt/temp_gabung/dists/ "$DEST/dists/" 2>/dev/null
+                    
+                    umount /mnt/temp_gabung
+                    echo "[OK] $(basename "$ISO") berhasil digabung."
+                else
+                    echo "[Gagal] Tidak bisa membaca isi $ISO"
+                fi
+            done
+            rmdir /mnt/temp_gabung
+            echo "=========================================================="
+            echo "SELESAI! Folder gabungan siap di: $DEST"
+            echo "=========================================================="
+        else
+            echo "[*] Penggabungan dibatalkan."
+        fi
+    fi
+
+    # 4. Opsi Lanjut atau Tidak
+    echo "----------------------------------------------------------"
+    read -p "Mau lanjut cari distro lain atau udahan? (lanjut/n): " OPSILANJUT
+    
+    if [[ "$OPSILANJUT" == "n" ]]; then
+        echo "Bye bye!"
+        break
+    elif [[ "$OPSILANJUT" == "lanjut" ]]; then
+        echo "[*] Mengulang dari awal..."
+        sleep 1
+        clear
+    else
+        echo "[!] Kembali ke menu utama..."
+        sleep 1
+        clear
+    fi
+done
