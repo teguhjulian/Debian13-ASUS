@@ -1,3 +1,4 @@
+#NOTE! sebelum menjalankan file ini, usahakan file nya di letakan di /usr/local/bin/ dan untuk menyimpannya nano /usr/local/bin/gudang-repo lalu beri chmod +x pada file tersebut
 #!/bin/bash
 
 # Cek akses root
