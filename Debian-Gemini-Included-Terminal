@@ -1,5 +1,6 @@
 #NOTE! sebelum copas kamu chek api key di https://aistudio.google.com/api-keys dan cp api key itu ke script ini cara buat api key kalian bisa shearcing di google gambang kok
 #KALO KAMU PEKE DEBIAN SCRIPT INI DIBERIKAN NAMA gemini di /usr/local/bin/gemini misalkan terus kalian chmod +x /usr/local/bin/gemini terus kalau mau pake cuma gemini halo misalkan..
+#DAN JUGA PASTIKAN KALIAN INSTALL glow DAN bc ya!
 #!/bin/bash
 #PASTE API KEY DISINI DI BARISAN API-KEY="KAMU ISI DI BAGIAN INI"
 API_KEY=""
